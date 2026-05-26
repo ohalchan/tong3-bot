@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>역학적 시스템 AI 튜터 - 역학이</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- KaTeX for Perfect Mathematical Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-emerald-500 text-white p-2 rounded-xl shadow-md shadow-emerald-100 flex items-center justify-center">
+                    <i data-lucide="orbit" class="w-6 h-6 animate-spin-slow"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 flex items-center gap-1.5">
+                        역학적 시스템 AI 튜터 <span class="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-semibold">통합과학Ⅰ</span>
+                    </h1>
+                    <p class="text-xs text-slate-500">알찬쌤의 노션 수업 자료 연계형 AI 공부방</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="resetChat()" class="text-xs text-slate-500 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 대화 초기화
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
+        
+        <!-- Left Column: Notion Curriculum & Notes (5 Cols on large screens) -->
+        <section class="lg:col-span-5 flex flex-col space-y-4">
+            
+            <!-- Notion Header Banner -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="text-2xl">🐷</span>
+                    <h2 class="font-bold text-slate-900 text-base">알찬쌤의 통합과학수역 [3단원]</h2>
+                </div>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    노션 강의노트에서 학습하고 싶은 차시를 선택해 보세요! 요약본 확인 및 관련된 질문을 챗봇에게 즉시 던질 수 있습니다.
+                </p>
+            </div>
+
+            <!-- Notion Lecture Note Tab System -->
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col flex-1 max-h-[600px] lg:max-h-[calc(100vh-220px)]">
+                <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="book-marked" class="text-emerald-600 w-4 h-4"></i>
+                        <span class="font-bold text-xs text-slate-700">차시별 체계적인 학습노트</span>
+                    </div>
+                    <span class="text-[10px] bg-slate-200/60 text-slate-600 px-2 py-0.5 rounded font-medium">총 8차시</span>
+                </div>
+
+                <!-- Lecture Notes Accordion / List -->
+                <div class="p-4 overflow-y-auto space-y-2.5 flex-1" id="notionNotesList">
+                    <!-- 1차시 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200" id="lecture-1">
+                        <button onclick="toggleLecture(1)" class="w-full text-left p-3 bg-slate-50/50 hover:bg-slate-50 flex items-center justify-between text-xs font-semibold text-slate-800">
+                            <span class="flex items-center gap-2">📘 1차시: 힘(중력)과 운동상태</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform" id="arrow-1"></i>
+                        </button>
+                        <div class="p-4 border-t border-slate-100 hidden text-xs text-slate-600 space-y-2 bg-white" id="body-1">
+                            <p class="leading-relaxed font-medium text-slate-900">핵심 내용 정리:</p>
+                            <ul class="list-disc list-inside space-y-1 pl-1">
+                                <li>힘은 물체의 모양이나 운동 상태(속력, 방향)를 변화시키는 원인입니다.</li>
+                                <li>중력은 질량을 가진 물체 사이에서 서로 잡아당기는 힘으로 연직 아래 방향으로 작용합니다.</li>
+                            </ul>
+                            <button onclick="askLecture('1차시 힘과 중력에 관해 단계별로 알려줘!')" class="mt-2 w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 이 차시 질문하고 시작하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2차시 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200" id="lecture-2">
+                        <button onclick="toggleLecture(2)" class="w-full text-left p-3 bg-slate-50/50 hover:bg-slate-50 flex items-center justify-between text-xs font-semibold text-slate-800">
+                            <span class="flex items-center gap-2">📘 2차시: 가속도와 속도</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform" id="arrow-2"></i>
+                        </button>
+                        <div class="p-4 border-t border-slate-100 hidden text-xs text-slate-600 space-y-2 bg-white" id="body-2">
+                            <p class="leading-relaxed font-medium text-slate-900">핵심 내용 정리:</p>
+                            <ul class="list-disc list-inside space-y-1 pl-1">
+                                <li>속도는 단위 시간당 변위(방향 포함)를 나타냅니다.</li>
+                                <li>가속도는 단위 시간당 속도의 변화율을 의미하며, 물체에 힘이 가해질 때 발생합니다.</li>
+                            </ul>
+                            <button onclick="askLecture('2차시 가속도와 속도 개념에 대해 이해하기 쉽게 설명해줘!')" class="mt-2 w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 이 차시 질문하고 시작하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3차시 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200" id="lecture-3">
+                        <button onclick="toggleLecture(3)" class="w-full text-left p-3 bg-slate-50/50 hover:bg-slate-50 flex items-center justify-between text-xs font-semibold text-slate-800">
+                            <span class="flex items-center gap-2">📘 3차시: 자유낙하운동, 중력가속도</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform" id="arrow-3"></i>
+                        </button>
+                        <div class="p-4 border-t border-slate-100 hidden text-xs text-slate-600 space-y-2 bg-white" id="body-3">
+                            <p class="leading-relaxed font-medium text-slate-900">핵심 내용 정리:</p>
+                            <ul class="list-disc list-inside space-y-1 pl-1">
+                                <li>공기 저항이 없을 때 오직 중력만 받아 낙하하는 운동입니다.</li>
+                                <li>질량에 무관하게 지표면 근처에서는 항상 일정한 중력 가속도 $g \approx 9.8\text{ m/s}^2$를 가집니다.</li>
+                            </ul>
+                            <button onclick="askLecture('3차시 자유낙하와 중력가속도가 왜 질량이랑 상관없는지 물어볼래!')" class="mt-2 w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 이 차시 질문하고 시작하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4차시 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200" id="lecture-4">
+                        <button onclick="toggleLecture(4)" class="w-full text-left p-3 bg-slate-50/50 hover:bg-slate-50 flex items-center justify-between text-xs font-semibold text-slate-800">
+                            <span class="flex items-center gap-2">📘 4차시: 수평으로 던진 물체의 운동</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform" id="arrow-4"></i>
+                        </button>
+                        <div class="p-4 border-t border-slate-100 hidden text-xs text-slate-600 space-y-2 bg-white" id="body-4">
+                            <p class="leading-relaxed font-medium text-slate-900">핵심 내용 정리:</p>
+                            <ul class="list-disc list-inside space-y-1 pl-1">
+                                <li>수평 방향: 힘이 작용하지 않으므로 등속 직선 운동을 합니다.</li>
+                                <li>연직 방향: 중력이 아래로만 지속해서 당기므로 자유 낙하 운동과 완벽히 같은 가속 운동을 합니다.</li>
+                            </ul>
+                            <button onclick="askLecture('4차시 수평으로 던진 물체와 수직 낙하가 동시에 떨어지는 이유에 대해 유도해줘!')" class="mt-2 w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 이 차시 질문하고 시작하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 5차시 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200" id="lecture-5">
+                        <button onclick="toggleLecture(5)" class="w-full text-left p-3 bg-slate-50/50 hover:bg-slate-50 flex items-center justify-between text-xs font-semibold text-slate-800">
+                            <span class="flex items-center gap-2">📘 5차시: 중력을 받는 물체와 생태계</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform" id="arrow-5"></i>
+                        </button>
+                        <div class="p-4 border-t border-slate-100 hidden text-xs text-slate-600 space-y-2 bg-white" id="body-5">
+                            <p class="leading-relaxed font-medium text-slate-900">핵심 내용 정리:</p>
+                            <ul class="list-disc list-inside space-y-1 pl-1">
+                                <li>중력은 대기층 형성, 바다의 순환, 기상 현상(눈, 비)을 제어합니다.</li>
+                                <li>코끼리의 두꺼운 뼈, 식물의 뿌리가 아래로 뻗는 굴지성 등은 모두 중력에 적응한 생물학적 현상입니다.</li>
+                            </ul>
+                            <button onclick="askLecture('5차시 지구 시스템과 생태계에 중력이 주는 영향들을 나열해 줄래?')" class="mt-2 w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 이 차시 질문하고 시작하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 6차시 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200" id="lecture-6">
+                        <button onclick="toggleLecture(6)" class="w-full text-left p-3 bg-slate-50/50 hover:bg-slate-50 flex items-center justify-between text-xs font-semibold text-slate-800">
+                            <span class="flex items-center gap-2">📘 6차시: 관성 법칙</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform" id="arrow-6"></i>
+                        </button>
+                        <div class="p-4 border-t border-slate-100 hidden text-xs text-slate-600 space-y-2 bg-white" id="body-6">
+                            <p class="leading-relaxed font-medium text-slate-900">핵심 내용 정리:</p>
+                            <ul class="list-disc list-inside space-y-1 pl-1">
+                                <li>힘이 작용하지 않을 때 물체가 자신의 원래 운동 상태를 그대로 유지하려는 성질입니다.</li>
+                                <li>예: 버스가 급발진하면 몸이 뒤로 쏠리는 현상, 급제동하면 앞으로 쏠리는 현상 등</li>
+                            </ul>
+                            <button onclick="askLecture('6차시 생활 속 관성의 현상들과 왜 그런 일이 생기는지 설명해줘')" class="mt-2 w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 이 차시 질문하고 시작하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 7차시 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200" id="lecture-7">
+                        <button onclick="toggleLecture(7)" class="w-full text-left p-3 bg-slate-50/50 hover:bg-slate-50 flex items-center justify-between text-xs font-semibold text-slate-800">
+                            <span class="flex items-center gap-2">📘 7차시: 운동량과 충격량의 관계</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform" id="arrow-7"></i>
+                        </button>
+                        <div class="p-4 border-t border-slate-100 hidden text-xs text-slate-600 space-y-2 bg-white" id="body-7">
+                            <p class="leading-relaxed font-medium text-slate-900">핵심 내용 정리:</p>
+                            <ul class="list-disc list-inside space-y-1 pl-1">
+                                <li>운동량: $p = mv$ (단위: $\text{kg}\cdot\text{m/s}$)</li>
+                                <li>충격량: $I = F\Delta t = \Delta p$ (물체가 입은 충격량은 운동량의 변화량과 완벽히 동치입니다.)</li>
+                            </ul>
+                            <button onclick="askLecture('7차시 운동량과 충격량의 방향 및 변화량 계산하는 요령을 단계적으로 짚어줘!')" class="mt-2 w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 이 차시 질문하고 시작하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 8차시 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200" id="lecture-8">
+                        <button onclick="toggleLecture(8)" class="w-full text-left p-3 bg-slate-50/50 hover:bg-slate-50 flex items-center justify-between text-xs font-semibold text-slate-800">
+                            <span class="flex items-center gap-2">📘 8차시: 충돌과 안전장치</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform" id="arrow-8"></i>
+                        </button>
+                        <div class="p-4 border-t border-slate-100 hidden text-xs text-slate-600 space-y-2 bg-white" id="body-8">
+                            <p class="leading-relaxed font-medium text-slate-900">핵심 내용 정리:</p>
+                            <ul class="list-disc list-inside space-y-1 pl-1">
+                                <li>같은 높이 낙하 시 충격량 $I$는 일정하게 고정됩니다.</li>
+                                <li>이때, 폭신한 장치가 충돌 시간($\Delta t$)을 늘려주어 충격력($F$)을 감소시킵니다.</li>
+                            </ul>
+                            <button onclick="askLecture('8차시 에어백과 헬멧이 우리를 안전하게 지켜주는 비례/반비례 관계를 설명해줘!')" class="mt-2 w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 이 차시 질문하고 시작하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-slate-100 bg-emerald-50/50 text-center">
+                    <button onclick="startInstantQuiz()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs py-2.5 rounded-xl transition-all font-semibold shadow-sm flex items-center justify-center gap-1.5">
+                        <i data-lucide="award" class="w-4 h-4"></i> 성취평가 퀴즈 풀기
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Column: Chat Bot Window (7 Cols on large screens) -->
+        <section class="lg:col-span-7 flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-h-[550px] lg:h-[calc(100vh-140px)]">
+            
+            <!-- Chat Header -->
+            <div class="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <div class="w-9 h-9 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold shadow-inner">
+                            🤖
+                        </div>
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-sm text-slate-900">학습 도우미 '역학이'</h3>
+                        <p class="text-[10px] text-emerald-600 font-medium">노션 수업 자료 연동형 • 소크라테스 튜터링</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="text-[11px] text-slate-400 bg-slate-200/50 px-2.5 py-1 rounded-full font-mono">
+                        Model: Gemini-2.5-Flash
+                    </span>
+                </div>
+            </div>
+
+            <!-- Chat Message Area -->
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-5 space-y-4">
+                <!-- Welcome Message from AI -->
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-sm shrink-0">🤖</div>
+                    <div class="space-y-1.5 max-w-[85%]">
+                        <div class="bg-slate-100 text-slate-800 p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed">
+                            반가워! 난 <strong>알찬쌤의 통합과학 3단원 노션 커리큘럼</strong>에 최적화된 공부 튜터 '역학이'야. 😉<br><br>
+                            왼쪽에서 공부하고 싶은 차시를 펼치고 <strong>'이 차시 질문하고 시작하기'</strong> 버튼을 누르거나, 아래 입력창에 궁금한 물리 질문을 편하게 써줘!
+                        </div>
+                        <span class="text-[10px] text-slate-400 block px-1">방금 전</span>
+                    </div>
+                </div>
+
+                <!-- Suggestion Chips inside Chat -->
+                <div id="suggestionBox" class="pl-11 grid grid-cols-1 md:grid-cols-2 gap-2 max-w-[95%]">
+                    <button onclick="usePreset('수평으로 던진 공과 자유 낙하하는 공 중 무엇이 먼저 떨어져?')" class="text-left text-xs bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 p-3 rounded-xl border border-slate-200 text-slate-700 transition-all flex items-start gap-2 group">
+                        <span class="text-emerald-500 font-bold group-hover:scale-110 transition-transform">4차시</span>
+                        <span>"수평투사와 수직 낙하는 왜 동시에 도달할까?" (낙하 분석)</span>
+                    </button>
+                    <button onclick="usePreset('질량이 다른 두 물체가 자유 낙하할 때 왜 가속도가 같아?')" class="text-left text-xs bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 p-3 rounded-xl border border-slate-200 text-slate-700 transition-all flex items-start gap-2 group">
+                        <span class="text-emerald-500 font-bold group-hover:scale-110 transition-transform">3차시</span>
+                        <span>"질량이 다른 물체의 낙하 속도 변화량이 왜 같지?" (가속도 원리)</span>
+                    </button>
+                    <button onclick="usePreset('속도가 v에서 반대 방향 v로 튕겨 나갔을 때 충격량 구하는 법 알려줘')" class="text-left text-xs bg-slate-50 hover:bg-indigo-50 hover:border-indigo-200 p-3 rounded-xl border border-slate-200 text-slate-700 transition-all flex items-start gap-2 group">
+                        <span class="text-indigo-500 font-bold group-hover:scale-110 transition-transform">7차시</span>
+                        <span>"방향이 바뀔 때 운동량 변화의 마이너스(-) 부호 적용은?" (속도 변화)</span>
+                    </button>
+                    <button onclick="usePreset('높은 곳에서 떨어질 때 푹신한 방석이 안전한 원리가 뭐야?')" class="text-left text-xs bg-slate-50 hover:bg-purple-50 hover:border-purple-200 p-3 rounded-xl border border-slate-200 text-slate-700 transition-all flex items-start gap-2 group">
+                        <span class="text-purple-500 font-bold group-hover:scale-110 transition-transform">8차시</span>
+                        <span>"달걀이 나무판에 닿으면 깨지는데 방석에서는 안전한 원리는?" (안전장치)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loader Indicator -->
+            <div id="loader" class="hidden px-5 py-2.5 bg-slate-50/80 border-t border-slate-100 flex items-center space-x-2 text-xs text-slate-500">
+                <div class="flex space-x-1 items-center">
+                    <span class="block w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                    <span class="block w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                    <span class="block w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
+                </div>
+                <span>역학이가 해당 단원 성취기준과 요약본 내용을 바탕으로 가이드를 짜는 중...</span>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="border-t border-slate-200 p-4 bg-slate-50">
+                <form id="chatForm" onsubmit="handleSendMessage(event)" class="flex space-x-2">
+                    <input type="text" id="userInput" placeholder="질문하거나 차시 연계 활동 내용을 편하게 입력하세요..." 
+                           class="flex-1 bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder-slate-400 transition-shadow">
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-medium text-sm transition-colors flex items-center justify-center space-x-1 shadow-md shadow-emerald-700/10 shrink-0">
+                        <span>전송</span>
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </form>
+                <p class="text-[10px] text-slate-400 mt-2 text-center">
+                    💡 팁: 왼쪽 '강의노트'에서 차시 요약을 살펴본 후에 질문하면 훨씬 입체적인 맞춤식 피드백을 받을 수 있습니다.
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Quiz Modal Backdrop -->
+    <div id="quizModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <!-- Quiz Content Container -->
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-100 flex flex-col transform scale-95 transition-all duration-300">
+            <!-- Modal Header -->
+            <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">🎯</span>
+                    <div>
+                        <h4 class="font-bold text-sm">성취기준 자가 퀴즈</h4>
+                        <p class="text-[10px] text-slate-400">고1 통합과학 수준 개념 진단</p>
+                    </div>
+                </div>
+                <button onclick="closeQuiz()" class="text-slate-400 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <!-- Quiz Body -->
+            <div class="p-6 space-y-4 flex-1">
+                <div class="flex justify-between items-center text-xs text-slate-400">
+                    <span id="quizProgress">문제 1 / 3</span>
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-semibold" id="quizCategory">중력의 작용</span>
+                </div>
+                
+                <h5 id="quizQuestion" class="font-bold text-slate-800 text-base leading-relaxed">
+                    물체의 질량이 더 커지면 자유 낙하할 때의 가속도 크기는 어떻게 변할까요?
+                </h5>
+                
+                <!-- Choices List -->
+                <div id="quizChoices" class="space-y-2 pt-2">
+                    <!-- Choices will be injected here -->
+                </div>
+
+                <!-- Explanation Area -->
+                <div id="quizFeedback" class="hidden p-4 rounded-2xl text-xs leading-relaxed">
+                    <!-- Explanation content -->
+                </div>
+            </div>
+
+            <!-- Footer Action Buttons -->
+            <div class="bg-slate-50 border-t border-slate-100 px-6 py-4 flex justify-between items-center">
+                <button onclick="closeQuiz()" class="text-slate-500 hover:text-slate-800 text-xs font-semibold px-3 py-2">
+                    그만두기
+                </button>
+                <button id="quizNextBtn" onclick="nextQuizQuestion()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-5 py-2.5 rounded-xl font-semibold transition-colors disabled:opacity-50" disabled>
+                    다음 문제
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Section -->
+    <script>
+        // Init Lucide Icons
+        lucide.createIcons();
+
+        // Helper to trigger KaTeX rendering on specific element
+        function parseMath(element) {
+            renderMathInElement(element, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ],
+                throwOnError: false
+            });
+        }
+
+        // Render equations in static contents on load
+        document.addEventListener("DOMContentLoaded", function() {
+            // Parse static KaTeX in lecture lists
+            parseMath(document.getElementById("notionNotesList"));
+        });
+
+        // Toggle Lecture Note accordion
+        function toggleLecture(id) {
+            const body = document.getElementById(`body-${id}`);
+            const arrow = document.getElementById(`arrow-${id}`);
+            const isHidden = body.classList.contains('hidden');
+            
+            // Close all others first
+            for (let i = 1; i <= 8; i++) {
+                const targetBody = document.getElementById(`body-${i}`);
+                const targetArrow = document.getElementById(`arrow-${i}`);
+                if (targetBody) targetBody.classList.add('hidden');
+                if (targetArrow) targetArrow.style.transform = 'rotate(0deg)';
+            }
+
+            if (isHidden) {
+                body.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+                parseMath(body);
+            }
+        }
+
+        // Action when student clicks 'Ask this lecture' in Notion pane
+        function askLecture(text) {
+            userInput.value = text;
+            chatForm.requestSubmit();
+        }
+
+        // Environment Variables
+        const apiKey = ""; // Runtime populated by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mechanic-physics-bot';
+
+        // Thread Conversation State
+        let conversationHistory = [
+            {
+                role: "user",
+                parts: [{ text: "안녕! 넌 고등학교 통합과학 '역학적 시스템' 단원을 지도하는 친절한 AI 과학 교사 '역학이'야. 아래 지침을 엄격하게 지켜 답변해줘:\n\n1. 알찬쌤의 통합과학 1차시부터 8차시까지의 노션 교육 과정 체계에 최적화하여 상냥하고 부드러운 대화 튜터링을 진행해줘.\n2. 고등학교 1학년 통합과학 수준과 성취기준([10통과1-03-03], [10통과1-03-04]) 범위 내의 질문에 알맞게 답해줘. 물리Ⅰ 수준의 복잡한 물리 계산식 등은 철저히 사양하고, 성취기준 개념 위주로 정성적인 해석을 우선시해줘.\n3. 학생들이 질문할 때 절대 단번에 정답이나 문제 풀이를 한꺼번에 다 주지 마. 먼저 어떤 원리나 상황(자유 낙하 vs 수평 투사, 운동량 vs 충격량 등)에 해당하는지를 학생 스스로 대답하게 질문하고, 힌트를 나누어 제공하는 '소크라테스식 대화법'을 꼭 사용해줘.\n4. 운동량과 충격량 계산 유형에서는 '운동 방향의 부호 설정'이 가장 중요하다는 점을 매번 단계적으로 일깨워줘.\n5. 안전장치 문제에서는 '충격량이 같을 때 접촉 시간($\\Delta t$)이 늘어남으로써 평균 힘($F$, 충격력)이 감소하여 안전해진다'는 반비례 관계를 집중적으로 알려줘.\n6. 모든 수식이나 단위를 답변할 때는 반드시 달러 기호($)로 묶어서 LaTeX 형식으로 출력해줘(예: $9.8\\text{ m/s}^2$, $p=mv$, $I=F\\Delta t$). 이모지를 섞어 아주 다정하고 상냥한 반말과 존댓말을 결합한 스타일로 대답해줘." }]
+            },
+            {
+                role: "model",
+                parts: [{ text: "알겠어! 고등학교 통합과학 성취기준에 맞춤화된 AI 튜터 '역학이'로서 자격을 완전히 갖췄어. 학생 눈높이를 넘어서는 물리Ⅰ 공식은 과감히 접어두고, 기본 원리($I = \\Delta p$)와 관계 해석 중심으로 단계적 질문을 던질게! 모든 수식은 KaTeX 규격에 맞춰 $ 기호로 감싸 깔끔하게 전달할 준비가 끝났어! ✨🤖" }]
+            }
+        ];
+
+        // Chat View DOM Elements
+        const chatMessages = document.getElementById("chatMessages");
+        const chatForm = document.getElementById("chatForm");
+        const userInput = document.getElementById("userInput");
+        const loader = document.getElementById("loader");
+        const suggestionBox = document.getElementById("suggestionBox");
+
+        // Set Scroll to Bottom helper
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Use Preset Question
+        function usePreset(questionText) {
+            userInput.value = questionText;
+            chatForm.requestSubmit();
+        }
+
+        // Print Message inside chat view & render KaTeX
+        function appendMessage(sender, text) {
+            const wrapper = document.createElement("div");
+            wrapper.className = "flex items-start space-x-3";
+
+            const avatar = document.createElement("div");
+            avatar.className = sender === "ai" 
+                ? "w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-sm shrink-0"
+                : "w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm shrink-0";
+            avatar.innerText = sender === "ai" ? "🤖" : "👤";
+
+            const bubbleWrapper = document.createElement("div");
+            bubbleWrapper.className = "space-y-1.5 max-w-[85%]";
+
+            const bubble = document.createElement("div");
+            bubble.className = sender === "ai"
+                ? "bg-slate-100 text-slate-800 p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed"
+                : "bg-emerald-600 text-white p-3.5 rounded-2xl rounded-tr-none shadow-sm text-sm leading-relaxed";
+            
+            // Format markdown text features
+            bubble.innerHTML = formatMarkdown(text);
+
+            const timestamp = document.createElement("span");
+            timestamp.className = "text-[10px] text-slate-400 block px-1";
+            timestamp.innerText = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+            bubbleWrapper.appendChild(bubble);
+            bubbleWrapper.appendChild(timestamp);
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(bubbleWrapper);
+
+            chatMessages.appendChild(wrapper);
+            
+            // Render Math equations in the newly appended message
+            parseMath(bubble);
+            scrollToBottom();
+        }
+
+        // Format Markdown Bold, Underline and Line breaks
+        function formatMarkdown(text) {
+            return text
+                .replace(/\n/g, "<br>")
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\*(.*?)\*/g, "<em>$1</em>");
+        }
+
+        // Fetch Response from Gemini-2.5-Flash
+        async function fetchAIResponse(messagesPayload) {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            let attempts = 0;
+            const maxAttempts = 5;
+            
+            while (attempts < maxAttempts) {
+                try {
+                    const response = await fetch(endpoint, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: messagesPayload,
+                            systemInstruction: {
+                                parts: [{ text: "너는 알찬쌤의 통합과학 3단원 노션 수업 체계를 완벽하게 따르고 성취기준을 잘 지키는 다정한 AI 과학 교사 '역학이'야. 복잡한 계산을 유도하지 말고, 학생들이 방향 설정, 원리 분석을 한 단계씩 대답하게 해줘. 모든 공식과 단위는 $ 기호로 감싸서 예쁜 수식으로 출력되도록 만들어야 해." }]
+                            }
+                        })
+                    });
+
+                    if (!response.ok) throw new Error(`API Status: ${response.status}`);
+                    
+                    const data = await response.json();
+                    const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (textResponse) return textResponse;
+                    
+                    throw new Error("Empty response parts");
+                } catch (err) {
+                    attempts++;
+                    if (attempts >= maxAttempts) throw err;
+                    const backoffTime = Math.pow(2, attempts) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, backoffTime));
+                }
+            }
+        }
+
+        // Send Handler
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            const query = userInput.value.trim();
+            if (!query) return;
+
+            userInput.value = "";
+            if (suggestionBox) {
+                suggestionBox.style.display = "none";
+            }
+
+            appendMessage("user", query);
+
+            conversationHistory.push({
+                role: "user",
+                parts: [{ text: query }]
+            });
+
+            loader.classList.remove("hidden");
+            scrollToBottom();
+
+            try {
+                const aiResult = await fetchAIResponse(conversationHistory);
+                loader.classList.add("hidden");
+
+                appendMessage("ai", aiResult);
+
+                conversationHistory.push({
+                    role: "model",
+                    parts: [{ text: aiResult }]
+                });
+
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                loader.classList.add("hidden");
+                appendMessage("ai", "서버 환경에 연결할 수 없거나, 일시적으로 신호 응답 시간이 초과되었어. 😥 잠시 후 다시 한번 시도해 줄래?");
+            }
+        }
+
+        // Reset Conversation
+        function resetChat() {
+            conversationHistory = [
+                {
+                    role: "user",
+                    parts: [{ text: "안녕! 넌 고등학교 통합과학 '역학적 시스템' 단원을 지도하는 친절한 AI 과학 교사 '역학이'야..." }]
+                },
+                {
+                    role: "model",
+                    parts: [{ text: "알겠어! 고등학교 통합과학 성취기준에 맞춤화된..." }]
+                }
+            ];
+            chatMessages.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-sm shrink-0">🤖</div>
+                    <div class="space-y-1.5 max-w-[85%]">
+                        <div class="bg-slate-100 text-slate-800 p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed">
+                            반가워! 난 <strong>알찬쌤의 통합과학 3단원 노션 커리큘럼</strong>에 최적화된 공부 튜터 '역학이'야. 😉<br><br>
+                            왼쪽에서 공부하고 싶은 차시를 펼치고 <strong>'이 차시 질문하고 시작하기'</strong> 버튼을 누르거나, 아래 입력창에 궁금한 물리 질문을 편하게 써줘!
+                        </div>
+                        <span class="text-[10px] text-slate-400 block px-1">방금 전</span>
+                    </div>
+                </div>
+            `;
+            if (suggestionBox) {
+                suggestionBox.style.display = "grid";
+            }
+            scrollToBottom();
+        }
+
+        // ==========================================
+        // INTEGRATED QUIZ DATA (Fully Aligned to Achievement Standards)
+        // ==========================================
+        const quizQuestions = [
+            {
+                category: "중력의 작용 [10통과1-03-03]",
+                question: "공기 저항이 없을 때, 같은 높이에서 쇠구슬과 깃털을 가만히 떨어뜨리면 어떻게 될까요? 중력가속도 법칙에 알맞은 결론을 골라보세요.",
+                choices: [
+                    { text: "쇠구슬이 깃털보다 무겁기 때문에 지구 중심으로 훨씬 더 빨리 떨어진다.", isCorrect: false },
+                    { text: "깃털이 공기 저항이 없어도 공기 속 부력의 영향으로 항상 더 늦게 도달한다.", isCorrect: false },
+                    { text: "질량과 관계없이 두 물체의 낙하 속도 변화율(가속도 $g$)이 같으므로 동시에 지면에 도달한다.", isCorrect: true },
+                    { text: "쇠구슬에는 중력이 작용하지만, 깃털은 가벼워서 중력이 전혀 작용하지 않는다.", isCorrect: false }
+                ],
+                explanation: "성취기준 핵심! 공기 저항이 없다면 모든 물체에는 질량에 상관없이 일정한 중력가속도($g \\approx 9.8\\text{ m/s}^2$)가 가해지므로 지면에 동시에 닿습니다. (질량이 큰 물체는 중력도 크지만, 그만큼 움직이려 하지 않는 관성도 크기 때문입니다.)"
+            },
+            {
+                category: "운동량과 충격량 [10통과1-03-04]",
+                question: "처음 운동 방향을 $+$ 방향으로 정의했을 때, 동일 선상에서 물체가 벽에 쾅 충돌한 뒤 **반대 방향**으로 튀어나온 상태가 되었습니다. 이때 나중 속도의 부호 방향은 어떻게 잡아야 할까요?",
+                choices: [
+                    { text: "속력의 크기만 사용하므로 그대로 $+$ 부호를 유지한다.", isCorrect: false },
+                    { text: "방향이 처음과 반대로 완전히 바뀌었으므로 반드시 $-$ 부호로 바꾼다.", isCorrect: true },
+                    { text: "충돌 후에는 항상 속도가 $0$이 되어야 하므로 부호 설정은 무의미하다.", isCorrect: false },
+                    { text: "물체의 속력이 처음보다 빨라지면 $+$, 느려지면 $-$로 쓴다.", isCorrect: false }
+                ],
+                explanation: "운동량과 충격량은 크기뿐만 아니라 '방향'을 가진 물리량입니다. 처음 운동 방향을 $+$로 설정했다면 반대 방향 속도는 반드시 $-$ 부호로 계산해야 오차 없는 충격량($I = \\Delta p = mv - mv_0$)을 얻을 수 있습니다."
+            },
+            {
+                category: "충돌과 안전장치 [10통과1-03-04]",
+                question: "같은 높이에서 떨어진 똑같은 달걀이 단단한 나무판에 충돌하면 깨지고, 폭신한 방석에 충돌하면 깨지지 않습니다. 이때 두 달걀이 겪은 충격량($I$)과 충돌 시간($\\Delta t$) 및 충격력($F$)의 관계는 어떠할까요?",
+                choices: [
+                    { text: "방석에 부딪힌 달걀은 정지하는 순간까지 운동량이 변하지 않으므로 더 적은 충격량을 받는다.", isCorrect: false },
+                    { text: "두 달걀이 받는 충격량($I$)은 서로 같지만, 방석은 충돌 시간($\\Delta t$)을 늘려 충격력($F$)을 줄였다.", isCorrect: true },
+                    { text: "나무판은 단단해서 충돌 시간을 늘리고 대신 충격력을 키웠다.", isCorrect: false },
+                    { text: "시간과 상관없이 방석이 달걀의 속력을 처음부터 느리게 만들었기 때문에 안 깨진다.", isCorrect: false }
+                ],
+                explanation: "동일한 높이에서 동일하게 정지했다면 두 달걀이 받은 총 운동량 변화량, 즉 충격량($I$)은 완전히 같습니다. 그러나 폭신한 방석은 닿아서 정지할 때까지의 충돌 시간($\\Delta t$)을 대폭 지연시킴으로써, 계란에 작용하는 평균 힘($F = \\frac{I}{\Delta t}$)을 파괴 강도 이하로 대폭 낮춰 안전하게 보호합니다."
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let selectedChoiceIndex = null;
+
+        const quizModal = document.getElementById("quizModal");
+        const quizProgress = document.getElementById("quizProgress");
+        const quizCategory = document.getElementById("quizCategory");
+        const quizQuestion = document.getElementById("quizQuestion");
+        const quizChoices = document.getElementById("quizChoices");
+        const quizFeedback = document.getElementById("quizFeedback");
+        const quizNextBtn = document.getElementById("quizNextBtn");
+
+        function startInstantQuiz() {
+            currentQuizIndex = 0;
+            selectedChoiceIndex = null;
+            quizModal.classList.remove("hidden");
+            quizModal.classList.add("flex");
+            renderQuizQuestion();
+        }
+
+        function closeQuiz() {
+            quizModal.classList.add("hidden");
+            quizModal.classList.remove("flex");
+        }
+
+        function renderQuizQuestion() {
+            const current = quizQuestions[currentQuizIndex];
+            quizProgress.innerText = `문제 ${currentQuizIndex + 1} / ${quizQuestions.length}`;
+            quizCategory.innerText = current.category;
+            quizQuestion.innerHTML = formatMarkdown(current.question);
+            
+            quizChoices.innerHTML = "";
+            quizFeedback.className = "hidden p-4 rounded-2xl text-xs leading-relaxed";
+            quizNextBtn.disabled = true;
+            quizNextBtn.innerText = currentQuizIndex === quizQuestions.length - 1 ? "결과 완성" : "다음 문제";
+
+            // Render Choices
+            current.choices.forEach((choice, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-slate-50 transition-all text-xs font-medium flex items-center justify-between group";
+                btn.onclick = () => selectQuizChoice(idx);
+                
+                const label = document.createElement("span");
+                label.innerHTML = formatMarkdown(`${idx + 1}. ${choice.text}`);
+                
+                const indicator = document.createElement("div");
+                indicator.className = "w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center shrink-0 ml-2 group-hover:border-emerald-500";
+                
+                btn.appendChild(label);
+                btn.appendChild(indicator);
+                quizChoices.appendChild(btn);
+            });
+
+            // Parse Math equations in Question Block
+            parseMath(quizQuestion);
+            parseMath(quizChoices);
+        }
+
+        function selectQuizChoice(choiceIdx) {
+            const current = quizQuestions[currentQuizIndex];
+            const choiceButtons = quizChoices.querySelectorAll("button");
+            
+            if (quizNextBtn.disabled === false) return;
+
+            selectedChoiceIndex = choiceIdx;
+            const isCorrect = current.choices[choiceIdx].isCorrect;
+
+            choiceButtons.forEach((btn, idx) => {
+                const isThisCorrect = current.choices[idx].isCorrect;
+                const indicator = btn.querySelector("div");
+                
+                if (idx === choiceIdx) {
+                    if (isCorrect) {
+                        btn.className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 text-xs font-medium flex items-center justify-between";
+                        indicator.innerHTML = "✓";
+                        indicator.className = "w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] shrink-0 ml-2 font-bold";
+                    } else {
+                        btn.className = "w-full text-left p-3.5 rounded-xl border-2 border-rose-300 bg-rose-50 text-rose-900 text-xs font-medium flex items-center justify-between";
+                        indicator.innerHTML = "✗";
+                        indicator.className = "w-4 h-4 rounded-full bg-rose-500 text-white flex items-center justify-center text-[10px] shrink-0 ml-2 font-bold";
+                    }
+                } else if (isThisCorrect) {
+                    btn.className = "w-full text-left p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 text-slate-800 text-xs font-medium flex items-center justify-between";
+                } else {
+                    btn.className = "w-full text-left p-3.5 rounded-xl border border-slate-100 bg-slate-50 text-slate-400 text-xs font-medium flex items-center justify-between opacity-55";
+                }
+            });
+
+            quizFeedback.classList.remove("hidden");
+            if (isCorrect) {
+                quizFeedback.className = "p-4 rounded-2xl text-xs leading-relaxed bg-emerald-50 text-emerald-800 border border-emerald-200 block";
+                quizFeedback.innerHTML = `<strong>🎉 정답입니다!</strong> <br><br> ${formatMarkdown(current.explanation)}`;
+            } else {
+                quizFeedback.className = "p-4 rounded-2xl text-xs leading-relaxed bg-rose-50/70 text-rose-800 border border-rose-200 block";
+                quizFeedback.innerHTML = `<strong>💡 오답입니다, 복습해볼까요?</strong> <br><br> ${formatMarkdown(current.explanation)}`;
+            }
+
+            parseMath(quizFeedback);
+            quizNextBtn.disabled = false;
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizIndex < quizQuestions.length - 1) {
+                currentQuizIndex++;
+                renderQuizQuestion();
+            } else {
+                quizCategory.innerText = "진단 완료";
+                quizQuestion.innerHTML = "🎉 축하합니다! 통합과학 역학 시스템 성취기준 성실 평가 과정을 모두 수료하셨습니다.";
+                quizChoices.innerHTML = `
+                    <div class="p-6 text-center space-y-4">
+                        <div class="text-5xl">🎓</div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            <strong>질량 관계 독립성($g$)</strong>, <strong>운동 방향 부호 변경 법칙($-$)</strong> 및 <strong>충격력 시간 완화 원리($F \\propto 1/\\Delta t$)</strong>의 기본 맥락을 완벽히 소화하셨습니다! <br><br>
+                            더 깊게 공부하고 싶은 부분은 역학이와의 1:1 대화로 언제든지 보완해 보세요.
+                        </p>
+                    </div>
+                `;
+                parseMath(quizChoices);
+                quizFeedback.classList.add("hidden");
+                quizNextBtn.innerText = "공부방으로 가기";
+                quizNextBtn.onclick = () => {
+                    closeQuiz();
+                    quizNextBtn.onclick = nextQuizQuestion;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
